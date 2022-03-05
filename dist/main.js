@@ -1,1 +1,1 @@
-window.addEventListener("load",(function(e){document.querySelector("#target").textContent="This is message by TypeScript."}));
+(()=>{console.log("Node path= "+process.argv[0]),console.log("script file path = "+process.argv[1]);for(var o=[],r=2;r<process.argv.length;r++)o.push(Number(process.argv[r]));console.log("parameters: "+o);for(var e,s,a,l=(e=0,s=0,a=0,function(o){e+=o;var r=Math.floor(o-o/1.1);return[o,r,e,s+=o-r,a+=r]}),c=0,g=o;c<g.length;c++){var n=l(g[c]);console.log(n)}})();
