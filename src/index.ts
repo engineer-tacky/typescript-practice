@@ -1,28 +1,64 @@
-console.log("Node path= " + process.argv[0])
-console.log("script file path = " + process.argv[1])
+import { memoryUsage } from "process"
 
-const data: number[] = []
-for (var i = 2; i < process.argv.length; i++) {
-    data.push(Number(process.argv[i]))
-}
-console.log('parameters: ' + data)
+let table:HTMLTableElement
+let message:HTMLInputElement
 
-const f = aggregate()
-
-for (let item of data) {
-    const res = f(item)
-    console.log(res)
+function showTable(html:string) {
+    table.innerHTML = html
 }
 
-function aggregate(): (n: number) => [number, number, number, number, number] {
-    let total = 0
-    let totalp = 0
-    let totalt = 0
-    return (n: number): [number, number, number, number, number] => {
-        total += n
-        let tax = Math.floor(n - n / 1.1)
-        totalp += n - tax
-        totalt += tax
-        return [n, tax, total, totalp, totalt]
+function doAction() {
+    const msg = message.value
+    memo.add({message:msg,date:new Date()})
+    memo.save()
+    memo.load()
+    showTable(memo.getHtml())
+}
+
+function doInitial() {
+    memo.data = []
+    memo.save()
+    memo.load()
+    message.value = ''
+    showTable(memo.getHtml())
+}
+
+type Memo = {
+    message:string,
+    date:Date
+}
+
+class MemoData {
+    data:Memo[] = []
+
+    add(mm:Memo):void {
+        this.data.unshift(mm)
+    }
+
+    save():void {
+        localStorage.setItem('memo_data', JSON.stringify(this.data))
+    }
+    load():void {
+        const readed = JSON.parse(localStorage.getItem('memo_data'))
+        this.data = readed ? readed : []
+    }
+
+    getHtml():string {
+        let html = '<thead><th>memo</th><th>date</th></thead><tbody>'
+        for(let item of this.data) {
+            html += '<tr><td>' + item.message + '</td><td>' + item.date.toLocaleString() + '</td></tr>'
+        }
+        return html + '</tbody>'
     }
 }
+
+const memo = new MemoData()
+
+window.addEventListener('load', () => {
+    table = document.querySelector('#table')
+    message = document.querySelector('#message')
+    document.querySelector('#btn').addEventListener('click', doAction)
+    document.querySelector('#initial').addEventListener('click', doInitial)
+    memo.load()
+    showTable(memo.getHtml())
+})
